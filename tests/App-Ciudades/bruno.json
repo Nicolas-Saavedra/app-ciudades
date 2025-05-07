@@ -1,0 +1,9 @@
+{
+  "version": "1",
+  "name": "App-Ciudades",
+  "type": "collection",
+  "ignore": [
+    "node_modules",
+    ".git"
+  ]
+}

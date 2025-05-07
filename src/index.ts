@@ -11,6 +11,7 @@ app.get("/health", (c) => {
 
 app.route("/auth", authn);
 app.route("/restaurant", restaurant);
+app.route("/transaction", restaurant);
 
 serve(
   {
