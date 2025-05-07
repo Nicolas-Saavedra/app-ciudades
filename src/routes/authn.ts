@@ -1,7 +1,7 @@
 import { Hono } from "hono";
 
-export const auth = new Hono();
+export const authn = new Hono();
 
-auth.get("/login", (c) => {});
+authn.get("/login", (c) => {});
 
-auth.get("/register", (c) => {});
+authn.get("/register", (c) => {});

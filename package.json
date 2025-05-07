@@ -8,11 +8,20 @@
   },
   "dependencies": {
     "@hono/node-server": "^1.14.1",
-    "hono": "^4.7.8"
+    "@hono/zod-validator": "^0.5.0",
+    "dotenv": "^16.5.0",
+    "drizzle-orm": "^0.43.1",
+    "hono": "^4.7.8",
+    "hono-openapi": "^0.4.8",
+    "pg": "^8.15.6",
+    "zod": "^3.24.4",
+    "zod-openapi": "^4.2.4"
   },
   "devDependencies": {
     "@types/node": "^20.11.17",
-    "tsx": "^4.7.1",
+    "@types/pg": "^8.15.0",
+    "drizzle-kit": "^0.31.1",
+    "tsx": "^4.19.4",
     "typescript": "^5.8.3"
   }
 }
