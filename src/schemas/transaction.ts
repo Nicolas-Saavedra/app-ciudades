@@ -20,3 +20,5 @@ export const transactionSchema = z.object({
 });
 
 export const transactionQueryResponseSchema = z.array(transactionSchema);
+
+export type Transaction = z.infer<typeof transactionSchema>;

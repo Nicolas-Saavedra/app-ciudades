@@ -1,0 +1,37 @@
+import { eq } from "drizzle-orm";
+import { db } from "../db/index.js";
+import { usersTable } from "../db/schema.js";
+import type { User } from "../schemas/user.js";
+import {
+  EntityAlreadyExistsError,
+  EntityNotFoundError,
+} from "../exceptions.js";
+import { pbkdf2 } from "crypto";
+import { getHashFromString } from "./authn.js";
+
+export const createUser = async (user: User) => {
+  const result = await db
+    .select()
+    .from(usersTable)
+    .where(eq(usersTable.email, user.email));
+
+  if (result.length > 0) {
+    throw new EntityAlreadyExistsError("User already exists");
+  }
+
+  user.secret = await getHashFromString(user.secret);
+  db.insert(usersTable).values(user);
+};
+
+export const getUserByEmail = async (email: string) => {
+  const result = await db
+    .select()
+    .from(usersTable)
+    .where(eq(usersTable.email, email));
+
+  if (result.length < 1) {
+    throw new EntityNotFoundError("User could not be found in the database");
+  }
+
+  return result[0];
+};

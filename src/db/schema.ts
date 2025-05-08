@@ -6,12 +6,12 @@ import {
   varchar,
 } from "drizzle-orm/pg-core";
 
-export const users = pgTable("users", {
+export const usersTable = pgTable("users", {
   email: varchar({ length: 64 }).notNull().unique(),
   secret: varchar({ length: 128 }).notNull().unique(),
 });
 
-export const transactions = pgTable("transactions", {
+export const transactionsTable = pgTable("transactions", {
   id: uuid("id").primaryKey().notNull(),
   transactionType: varchar("transaction_type", { length: 32 }).notNull(),
   transactionDescription: varchar("transaction_description", {
@@ -21,7 +21,7 @@ export const transactions = pgTable("transactions", {
   currencyCode: varchar("currency_code", { length: 3 }).notNull(), // ISO 4217 codes are 3 characters
 });
 
-export const restaurants = pgTable("restaurants", {
+export const restaurantsTable = pgTable("restaurants", {
   id: varchar("id", { length: 127 }).primaryKey().notNull(),
   name: varchar("name", { length: 255 }).notNull(),
   streetAddress: varchar("street_address", { length: 255 }).notNull(),

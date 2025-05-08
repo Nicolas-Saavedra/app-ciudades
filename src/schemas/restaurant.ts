@@ -66,6 +66,6 @@ export const restaurantSchema = z.object({
   }),
 });
 
-// Quite simple considering what's in the restaurant's schema, but makes
-// sense to make the separation here
 export const restaurantSearchResponseSchema = z.array(restaurantSchema);
+
+export type Restaurant = z.infer<typeof restaurantSchema>;

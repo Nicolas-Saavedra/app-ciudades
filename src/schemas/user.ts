@@ -14,5 +14,7 @@ export const loginResponseSchema = z.object({
   access_token: z.string().openapi({ description: "JWT access token" }),
   refresh_token: z.string().openapi({ description: "JWT refresh token" }),
 });
-// Alias
+
 export const registerResponseSchema = loginResponseSchema;
+
+export type User = z.infer<typeof userSchema>;

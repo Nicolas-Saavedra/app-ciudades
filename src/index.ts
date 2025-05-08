@@ -2,6 +2,9 @@ import { serve } from "@hono/node-server";
 import { Hono } from "hono";
 import { authn } from "./routes/authn.js";
 import { restaurant } from "./routes/restaurant.js";
+import { configDotenv } from "dotenv";
+
+configDotenv();
 
 const app = new Hono();
 
