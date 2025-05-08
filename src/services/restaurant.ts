@@ -1,16 +1,37 @@
-import { restaurantsTable } from "../db/schema.js";
-import type { Coordinates } from "../schemas/restaurant.js";
+import { eq, getTableColumns, sql } from "drizzle-orm";
+import { db } from "../db/index.js";
+import { citiesTable, restaurantsTable } from "../db/schema.js";
+import type { Coordinates, Restaurant } from "../schemas/restaurant.js";
+import { EntityNotFoundError } from "../exceptions.js";
 
-export const fetchRestaurants = async (coordinates: Coordinates) => {
-  const result = await db
-    .select()
+export const fetchRestaurants = async (
+  coordinates: Coordinates,
+  limit: number,
+) => {
+  // Drizzle ORM avoids SQL Injections here with `sql`
+  const sqlPoint = sql`ST_SetSRID(ST_MakePoint(${coordinates.longitude}, ${coordinates.latitude}), 4326)`;
+
+  const results = await db
+    .select({
+      ...getTableColumns(restaurantsTable),
+      distance: sql`ST_Distance(${restaurantsTable.point}, ${sqlPoint})`,
+    })
     .from(restaurantsTable)
-    .where(eq(usersTable.email, user.email));
+    .orderBy(sql`${restaurantsTable.point} <-> ${sqlPoint}`)
+    .limit(limit);
 
-  if (result.length > 0) {
-    throw new EntityAlreadyExistsError("User already exists");
+  return results as Restaurant[];
+};
+
+export const fetchCoordinates = async (city: string) => {
+  const cities = await db
+    .select()
+    .from(citiesTable)
+    .where(eq(citiesTable.city, city));
+
+  if (cities.length === 0) {
+    throw new EntityNotFoundError(`Could not find city with name ${city}`);
   }
 
-  user.secret = await getHashFromString(user.secret);
-  db.insert(usersTable).values(user).execute();
+  return cities[0];
 };
