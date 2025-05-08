@@ -1,4 +1,4 @@
-INSERT INTO transactions (transactionType,transactionDescription,amount,currencyCode,id) VALUES
+INSERT INTO transactions (transaction_type,transaction_description,amount,currency_code,id) VALUES
  ('withdrawal','invoice transaction at Deckow, Reynolds and Satterfield using card ending with ***5514 for CAD 99.97 in account ***04836176',20.58,'AWG','fbdf302f-2949-4806-8048-96204f5371c9')
 ,('withdrawal','payment transaction at Medhurst, Konopelski and Bayer using card ending with ***8661 for KMF 65.05 in account ***09995833',15.96,'BIF','3a37a197-d02e-4642-9ac4-6838920fdc7f')
 ,('invoice','invoice transaction at Reinger - Walker using card ending with ***3051 for MAD 45.22 in account ***93837258',586.75,'HTG','f498424c-210f-46c6-a340-0d3bbbcc91e5')

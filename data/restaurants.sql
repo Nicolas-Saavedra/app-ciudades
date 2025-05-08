@@ -1,4 +1,4 @@
-INSERT INTO restaurants (streetAddress,city,country,latitude,longitude,name,uuid) VALUES
+INSERT INTO restaurants (street_address,city,country,latitude,longitude,name,id) VALUES
  ('8917 Miller Park','South Carleyland','Austria',-7.3352,131.8235,'Mills - Conroy','ba00fbdf-302f-4294-9980-604896204f53')
 ,('86135 Medhurst Lane','Port Lenorachester','Central African Republic',-8.9101,-156.5815,'White Group','f9c64013-a37a-4197-8d02-e642ac468389')
 ,('98749 Soledad Via','Monicashire','Gambia',-74.0714,25.3598,'Lebsack Inc','f5d6b48d-95f4-4984-824c-210f6c63400d')
