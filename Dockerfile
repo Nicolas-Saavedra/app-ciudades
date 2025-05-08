@@ -5,7 +5,7 @@ FROM base AS builder
 RUN apk add --no-cache gcompat
 WORKDIR /app
 
-COPY package.json tsconfig.json yarn.lock src  ./
+COPY package.json tsconfig.json yarn.lock src ./
 
 RUN yarn && \
     yarn build 

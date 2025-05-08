@@ -14,6 +14,12 @@ services:
       - internal
     volumes:
       - pg_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 10s
+      retries: 5
+      start_period: 30s
+      timeout: 10s
   app:
     build: .
     ports:
@@ -22,6 +28,9 @@ services:
       - .env
     networks:
       - internal
+    depends_on:
+      database:
+        condition: service_healthy
 volumes:
   pg_data:
 
