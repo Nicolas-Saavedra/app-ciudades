@@ -16,7 +16,6 @@ import {
   EntityAlreadyExistsError,
   EntityNotFoundError,
 } from "../exceptions.js";
-import { verify } from "hono/jwt";
 import {
   JwtTokenExpired,
   JwtTokenInvalid,
@@ -29,6 +28,7 @@ import {
   signRefreshToken,
   verifyRefreshToken,
 } from "../services/authn.js";
+import { timingSafeEqual } from "crypto";
 
 export const authn = new Hono();
 
@@ -141,8 +141,12 @@ authn.post(
       }
     }
 
-    if (foundUser.secret !== (await getHashFromString(possibleUser.secret))) {
-      // Better to be not very descriptive when dealing with login
+    if (
+      !timingSafeEqual(
+        Buffer.from(foundUser.secret),
+        Buffer.from(await getHashFromString(possibleUser.secret)),
+      )
+    ) {
       c.status(404);
       return c.text(
         "Could not process the request: Your username or password is incorrect",

@@ -9,7 +9,7 @@ import { transactions } from "./routes/transaction.js";
 
 configDotenv();
 
-const app = new Hono();
+export const app = new Hono();
 
 app.get("/health", (c) => {
   return c.text("OK");
