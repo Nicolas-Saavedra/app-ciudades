@@ -1,9 +1,17 @@
 import { pbkdf2 } from "crypto";
-import { sign } from "hono/jwt";
+import { sign, verify } from "hono/jwt";
 
 const PASSWORD_SALT = process.env.PASSWORD_SALT;
 const JWT_SECRET_ACCESS_KEY = process.env.JWT_SECRET_ACCESS_KEY;
 const JWT_SECRET_REFRESH_KEY = process.env.JWT_SECRET_REFRESH_KEY;
+
+export const verifyAccessToken = async (token: string) => {
+  return await verify(token, JWT_SECRET_ACCESS_KEY!);
+};
+
+export const verifyRefreshToken = async (token: string) => {
+  return await verify(token, JWT_SECRET_REFRESH_KEY!);
+};
 
 export const getHashFromString = async (secret: string) => {
   return new Promise<string>((resolve, reject) => {

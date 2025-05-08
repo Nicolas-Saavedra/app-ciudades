@@ -6,7 +6,7 @@ import {
   EntityAlreadyExistsError,
   EntityNotFoundError,
 } from "../exceptions.js";
-import { getHashFromString } from "./authn.js";
+import { getHashFromString } from "../services/authn.js";
 
 export const createUser = async (user: User) => {
   const result = await db

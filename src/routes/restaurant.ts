@@ -7,7 +7,10 @@ import {
   restaurantSearchSchema,
   type Coordinates,
 } from "../schemas/restaurant.js";
-import { fetchCoordinates, fetchRestaurants } from "../services/restaurant.js";
+import {
+  fetchCoordinates,
+  fetchRestaurants,
+} from "../repositories/restaurant.js";
 import { EntityNotFoundError } from "../exceptions.js";
 import { authnMiddleware } from "../middlewares/authn.js";
 

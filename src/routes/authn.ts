@@ -11,12 +11,12 @@ import {
   refreshTokenSchema,
 } from "../schemas/authn.js";
 import { zValidator } from "@hono/zod-validator";
-import { createUser, getUserByEmail } from "../services/user.js";
+import { createUser, getUserByEmail } from "../repositories/user.js";
 import {
   EntityAlreadyExistsError,
   EntityNotFoundError,
 } from "../exceptions.js";
-import { sign, verify } from "hono/jwt";
+import { verify } from "hono/jwt";
 import {
   JwtTokenExpired,
   JwtTokenInvalid,
@@ -27,6 +27,7 @@ import {
   getHashFromString,
   signAccessToken,
   signRefreshToken,
+  verifyRefreshToken,
 } from "../services/authn.js";
 
 export const authn = new Hono();
@@ -184,7 +185,7 @@ authn.post(
     let payload: JWTPayload;
 
     try {
-      payload = await verify(refreshToken, JWT_SECRET_REFRESH_KEY!);
+      payload = await verifyRefreshToken(refreshToken);
     } catch (err) {
       if (
         err instanceof JwtTokenInvalid ||
