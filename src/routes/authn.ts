@@ -239,3 +239,7 @@ authn.post(
     });
   },
 );
+
+// There is no logout route cause unless we wish to introduce tracking of logged out users,
+// tokens cannot be manipulated or invalidated easily from the server without adding
+// Session state of some kind on the server, which limits the usefulness of JWT tokens

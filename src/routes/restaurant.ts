@@ -9,8 +9,11 @@ import {
 } from "../schemas/restaurant.js";
 import { fetchCoordinates, fetchRestaurants } from "../services/restaurant.js";
 import { EntityNotFoundError } from "../exceptions.js";
+import { authnMiddleware } from "../middlewares/authn.js";
 
 export const restaurants = new Hono();
+
+restaurants.use("/*", authnMiddleware);
 
 restaurants.post(
   "/search",
@@ -38,10 +41,13 @@ restaurants.post(
     },
     responses: {
       200: {
-        description: "Successful login",
+        description: "Search resulted in success",
         content: {
           "text/json": { schema: resolver(restaurantSearchResponseSchema) },
         },
+      },
+      404: {
+        description: "Missing resource in database",
       },
     },
   }),
@@ -58,7 +64,7 @@ restaurants.post(
         coordinates = await fetchCoordinates(query.city);
       } catch (err) {
         if (err instanceof EntityNotFoundError) {
-          c.status(403);
+          c.status(404);
           return c.text(
             "Could not process the request: A city with that name does not exist in our database, please try another name",
           );

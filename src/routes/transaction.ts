@@ -3,8 +3,11 @@ import { describeRoute } from "hono-openapi";
 import { transactionQueryResponseSchema } from "../schemas/transaction.js";
 import { resolver } from "hono-openapi/zod";
 import { fetchTransactions } from "../services/transaction.js";
+import { authnMiddleware } from "../middlewares/authn.js";
 
 export const transactions = new Hono();
+
+transactions.use("/*", authnMiddleware);
 
 transactions.get(
   "/",
@@ -12,7 +15,7 @@ transactions.get(
     description: "Views transaction history",
     responses: {
       200: {
-        description: "Successful login",
+        description: "Successful transaction",
         content: {
           "text/json": { schema: resolver(transactionQueryResponseSchema) },
         },
