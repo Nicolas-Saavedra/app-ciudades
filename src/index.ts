@@ -1,10 +1,11 @@
 import { serve } from "@hono/node-server";
 import { Hono } from "hono";
 import { authn } from "./routes/authn.js";
-import { restaurant } from "./routes/restaurant.js";
+import { restaurants } from "./routes/restaurant.js";
 import { configDotenv } from "dotenv";
 import { openAPISpecs } from "hono-openapi";
 import { Scalar } from "@scalar/hono-api-reference";
+import { transactions } from "./routes/transaction.js";
 
 configDotenv();
 
@@ -15,8 +16,8 @@ app.get("/health", (c) => {
 });
 
 app.route("/auth", authn);
-app.route("/restaurant", restaurant);
-app.route("/transaction", restaurant);
+app.route("/restaurants", restaurants);
+app.route("/transactions", transactions);
 
 app.get("/docs", Scalar({ url: "/openapi" }));
 

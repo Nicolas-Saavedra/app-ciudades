@@ -8,14 +8,11 @@ import {
   type Coordinates,
 } from "../schemas/restaurant.js";
 import { fetchCoordinates, fetchRestaurants } from "../services/restaurant.js";
-import {
-  EntityAlreadyExistsError,
-  EntityNotFoundError,
-} from "../exceptions.js";
+import { EntityNotFoundError } from "../exceptions.js";
 
-export const restaurant = new Hono();
+export const restaurants = new Hono();
 
-restaurant.post(
+restaurants.post(
   "/search",
   describeRoute({
     description: "Searches for restaurants based on city",
