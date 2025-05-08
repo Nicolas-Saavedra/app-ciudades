@@ -23,10 +23,11 @@ import {
   JwtTokenSignatureMismatched,
   type JWTPayload,
 } from "hono/utils/jwt/types";
-import { getHashFromString } from "../services/authn.js";
-
-const JWT_SECRET_ACCESS_KEY = process.env.JWT_SECRET_ACCESS_KEY;
-const JWT_SECRET_REFRESH_KEY = process.env.JWT_SECRET_REFRESH_KEY;
+import {
+  getHashFromString,
+  signAccessToken,
+  signRefreshToken,
+} from "../services/authn.js";
 
 export const authn = new Hono();
 
@@ -81,20 +82,8 @@ authn.post(
     }
 
     return c.json({
-      access_token: await sign(
-        {
-          sub: user.email,
-          exp: Math.floor(Date.now() / 1000) + 60 * 5, // 5 minutes
-        },
-        JWT_SECRET_ACCESS_KEY!,
-      ),
-      refresh_token: await sign(
-        {
-          sub: user.email,
-          exp: Math.floor(Date.now() / 1000) + 60 * 60 * 24 * 7, // 7 days
-        },
-        JWT_SECRET_REFRESH_KEY!,
-      ),
+      access_token: await signAccessToken(user.email),
+      refresh_token: await signRefreshToken(user.email),
     });
   },
 );
@@ -160,20 +149,8 @@ authn.post(
     }
 
     return c.json({
-      access_token: await sign(
-        {
-          sub: foundUser.email,
-          exp: Math.floor(Date.now() / 1000) + 60 * 15, // 15 minutes
-        },
-        JWT_SECRET_ACCESS_KEY!,
-      ),
-      refresh_token: await sign(
-        {
-          sub: foundUser.email,
-          exp: Math.floor(Date.now() / 1000) + 60 * 60 * 24 * 7, // 7 days
-        },
-        JWT_SECRET_REFRESH_KEY!,
-      ),
+      access_token: await signAccessToken(foundUser.email),
+      refresh_token: await signRefreshToken(foundUser.email),
     });
   },
 );
@@ -229,13 +206,7 @@ authn.post(
     }
 
     return c.json({
-      access_token: await sign(
-        {
-          sub: payload.sub,
-          exp: Math.floor(Date.now() / 1000) + 60 * 15, // 5 minutes
-        },
-        JWT_SECRET_ACCESS_KEY!,
-      ),
+      access_token: await signAccessToken(payload.sub as string),
     });
   },
 );
