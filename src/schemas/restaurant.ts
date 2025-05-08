@@ -26,10 +26,10 @@ export const restaurantSearchSchema = z
       if (data.coordinates === undefined) {
         return data.city !== undefined;
       }
-      return data.city !== undefined && data.coordinates !== undefined;
+      return false;
     },
     {
-      message: "You must specify either city or coordinates",
+      message: "You must specify either city OR coordinates",
     },
   );
 
@@ -57,7 +57,15 @@ export const restaurantSchema = z.object({
   }),
 });
 
-export const restaurantSearchResponseSchema = z.array(restaurantSchema);
+export const restaurantSearchResponseSchema = z.array(
+  restaurantSchema.extend({
+    distance: z.number().openapi({
+      description: "Distance from the queried point/city",
+    }),
+  }),
+);
+
+export type RestaurantResponse = z.infer<typeof restaurantSearchResponseSchema>;
 
 export type Restaurant = z.infer<typeof restaurantSchema>;
 

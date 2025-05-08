@@ -5,7 +5,13 @@ import { resolver } from "hono-openapi/zod";
 import {
   restaurantSearchResponseSchema,
   restaurantSearchSchema,
+  type Coordinates,
 } from "../schemas/restaurant.js";
+import { fetchCoordinates, fetchRestaurants } from "../services/restaurant.js";
+import {
+  EntityAlreadyExistsError,
+  EntityNotFoundError,
+} from "../exceptions.js";
 
 export const restaurant = new Hono();
 
@@ -43,7 +49,33 @@ restaurant.post(
     },
   }),
   zValidator("json", restaurantSearchSchema),
-  (c) => {
+  async (c) => {
     const query = c.req.valid("json");
+
+    let coordinates: Coordinates;
+
+    if (query.city === undefined) {
+      coordinates = query.coordinates!;
+    } else {
+      try {
+        coordinates = await fetchCoordinates(query.city);
+      } catch (err) {
+        if (err instanceof EntityNotFoundError) {
+          c.status(403);
+          return c.text(
+            "Could not process the request: A city with that name does not exist in our database, please try another name",
+          );
+        } else {
+          // Should throw some alarms
+          console.log(err);
+          c.status(500);
+          return c.text(
+            "Could not process the request: An unexpected error ocurred in the server",
+          );
+        }
+      }
+    }
+
+    return c.json(await fetchRestaurants(coordinates, 10));
   },
 );
