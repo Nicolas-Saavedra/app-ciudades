@@ -13,6 +13,26 @@ restaurant.post(
   "/search",
   describeRoute({
     description: "Searches for restaurants based on city",
+    requestBody: {
+      required: true,
+      content: {
+        "application/json": {
+          schema: {
+            type: "object",
+            properties: {
+              city: { type: "string" },
+              coordinates: {
+                type: "object",
+                properties: {
+                  latitude: { type: "number" },
+                  longitude: { type: "number" },
+                },
+              },
+            },
+          },
+        },
+      },
+    },
     responses: {
       200: {
         description: "Successful login",
@@ -22,9 +42,8 @@ restaurant.post(
       },
     },
   }),
-  zValidator("query", restaurantSearchSchema),
+  zValidator("json", restaurantSearchSchema),
   (c) => {
-    const query = c.req.valid("query");
-    return c.text("Successful validation");
+    const query = c.req.valid("json");
   },
 );

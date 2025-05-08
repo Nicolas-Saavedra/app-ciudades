@@ -6,7 +6,6 @@ import {
   EntityAlreadyExistsError,
   EntityNotFoundError,
 } from "../exceptions.js";
-import { pbkdf2 } from "crypto";
 import { getHashFromString } from "./authn.js";
 
 export const createUser = async (user: User) => {

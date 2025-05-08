@@ -2,27 +2,18 @@ import { z } from "zod";
 
 import "zod-openapi/extend";
 
+export const coordinateSchema = z.object({
+  latitude: z.number(),
+  longitude: z.number(),
+});
+
 export const restaurantSearchSchema = z
   .object({
     city: z
       .string()
       .optional()
       .openapi({ description: "City in which to search restaurants" }),
-    coordinates: z
-      .object({
-        // Regex extracted from https://github.com/colinhacks/zod/issues/2600
-        // Really wish Zod had this by default
-        latitude: z
-          .string()
-          .regex(
-            /^(\+|-)?(?:90(?:(?:\.0{1,6})?)|(?:[0-9]|[1-8][0-9])(?:(?:\.[0-9]{1,6})?))$/,
-          ),
-        longitude: z
-          .string()
-          .regex(
-            /^(\+|-)?(?:180(?:(?:\.0{1,6})?)|(?:[0-9]|[1-9][0-9]|1[0-7][0-9])(?:(?:\.[0-9]{1,6})?))$/,
-          ),
-      })
+    coordinates: coordinateSchema
       .optional()
       .openapi({ description: "Coordinates to search restaurants in" }),
   })
@@ -69,3 +60,5 @@ export const restaurantSchema = z.object({
 export const restaurantSearchResponseSchema = z.array(restaurantSchema);
 
 export type Restaurant = z.infer<typeof restaurantSchema>;
+
+export type Coordinates = z.infer<typeof coordinateSchema>;

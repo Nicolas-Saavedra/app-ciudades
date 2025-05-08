@@ -1,3 +1,4 @@
+import { index } from "drizzle-orm/gel-core";
 import {
   doublePrecision,
   geometry,
