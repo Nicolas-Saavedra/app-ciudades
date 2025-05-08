@@ -7,14 +7,22 @@ import {
   loginUserSchema,
   registerResponseSchema,
   type User,
-} from "../schemas/user.js";
+  refreshResponseSchema,
+  refreshTokenSchema,
+} from "../schemas/authn.js";
 import { zValidator } from "@hono/zod-validator";
 import { createUser, getUserByEmail } from "../services/user.js";
 import {
   EntityAlreadyExistsError,
   EntityNotFoundError,
 } from "../exceptions.js";
-import { sign } from "hono/jwt";
+import { sign, verify } from "hono/jwt";
+import {
+  JwtTokenExpired,
+  JwtTokenInvalid,
+  JwtTokenSignatureMismatched,
+  type JWTPayload,
+} from "hono/utils/jwt/types";
 
 const JWT_SECRET_ACCESS_KEY = process.env.JWT_SECRET_ACCESS_KEY;
 const JWT_SECRET_REFRESH_KEY = process.env.JWT_SECRET_REFRESH_KEY;
@@ -56,7 +64,7 @@ authn.post(
       }
     }
 
-    return {
+    return c.json({
       access_token: sign(
         {
           sub: user.email,
@@ -71,7 +79,7 @@ authn.post(
         },
         JWT_SECRET_REFRESH_KEY!,
       ),
-    };
+    });
   },
 );
 
@@ -120,7 +128,7 @@ authn.post(
       );
     }
 
-    return {
+    return c.json({
       access_token: sign(
         {
           sub: foundUser.email,
@@ -135,6 +143,60 @@ authn.post(
         },
         JWT_SECRET_REFRESH_KEY!,
       ),
-    };
+    });
+  },
+);
+
+authn.post(
+  "/refresh",
+  describeRoute({
+    description: "Refreshes the access token of a user using the refresh token",
+    responses: {
+      200: {
+        description: "Successful token refresh",
+        content: {
+          "text/json": { schema: resolver(refreshResponseSchema) },
+        },
+      },
+    },
+  }),
+  // Using cookies here since HttpOnly should be used for refresh tokens
+  zValidator("cookie", refreshTokenSchema),
+  async (c) => {
+    const refreshToken = c.req.valid("cookie").refresh_token;
+
+    let payload: JWTPayload;
+
+    try {
+      payload = await verify(refreshToken, JWT_SECRET_REFRESH_KEY!);
+    } catch (err) {
+      if (
+        err instanceof JwtTokenInvalid ||
+        err instanceof JwtTokenExpired ||
+        err instanceof JwtTokenSignatureMismatched // TODO: could group these into a superclass
+      ) {
+        c.status(401);
+        return c.text(
+          "Could not process the request: The JWT token is not valid",
+        );
+      } else {
+        // Should throw some alarms
+        console.log(err);
+        c.status(500);
+        return c.text(
+          "Could not process the request: An unexpected error ocurred in the server",
+        );
+      }
+    }
+
+    return c.json({
+      access_token: sign(
+        {
+          sub: payload.sub,
+          exp: Math.floor(Date.now() / 1000) + 60 * 5, // 5 minutes
+        },
+        JWT_SECRET_ACCESS_KEY!,
+      ),
+    });
   },
 );

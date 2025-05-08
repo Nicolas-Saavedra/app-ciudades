@@ -1,7 +1,7 @@
 import { eq } from "drizzle-orm";
 import { db } from "../db/index.js";
 import { usersTable } from "../db/schema.js";
-import type { User } from "../schemas/user.js";
+import type { User } from "../schemas/authn.js";
 import {
   EntityAlreadyExistsError,
   EntityNotFoundError,
