@@ -3,6 +3,8 @@ import { Hono } from "hono";
 import { authn } from "./routes/authn.js";
 import { restaurant } from "./routes/restaurant.js";
 import { configDotenv } from "dotenv";
+import { openAPISpecs } from "hono-openapi";
+import { Scalar } from "@scalar/hono-api-reference";
 
 configDotenv();
 
@@ -15,6 +17,32 @@ app.get("/health", (c) => {
 app.route("/auth", authn);
 app.route("/restaurant", restaurant);
 app.route("/transaction", restaurant);
+
+app.get("/docs", Scalar({ url: "/openapi" }));
+
+app.get(
+  "/openapi",
+  openAPISpecs(app, {
+    documentation: {
+      info: {
+        title: "Restaurant app",
+        version: "1.0.0",
+        description: "Restaurant application made as an entry level test",
+      },
+      servers: [{ url: "http://localhost:3000", description: "Local Server" }],
+      components: {
+        securitySchemes: {
+          bearerAuth: {
+            type: "http",
+            scheme: "bearer",
+            bearerFormat: "JWT",
+          },
+        },
+      },
+      security: [{ bearerAuth: [] }],
+    },
+  }),
+);
 
 serve(
   {
