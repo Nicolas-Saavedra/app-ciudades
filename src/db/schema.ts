@@ -1,5 +1,6 @@
 import {
   doublePrecision,
+  geometry,
   numeric,
   pgTable,
   uuid,
@@ -29,4 +30,12 @@ export const restaurantsTable = pgTable("restaurants", {
   country: varchar("country", { length: 127 }).notNull(),
   latitude: doublePrecision("latitude").notNull(),
   longitude: doublePrecision("longitude").notNull(),
+  point: geometry("point", { type: "point" }),
+});
+
+export const citiesTable = pgTable("cities", {
+  city: varchar("city", { length: 127 }).primaryKey().notNull(),
+  latitude: doublePrecision("latitude").notNull(),
+  longitude: doublePrecision("longitude").notNull(),
+  point: geometry("point", { type: "point" }),
 });
