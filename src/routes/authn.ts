@@ -23,6 +23,7 @@ import {
   JwtTokenSignatureMismatched,
   type JWTPayload,
 } from "hono/utils/jwt/types";
+import { getHashFromString } from "../services/authn.js";
 
 const JWT_SECRET_ACCESS_KEY = process.env.JWT_SECRET_ACCESS_KEY;
 const JWT_SECRET_REFRESH_KEY = process.env.JWT_SECRET_REFRESH_KEY;
@@ -33,6 +34,21 @@ authn.post(
   "/register",
   describeRoute({
     description: "Registers a user into the system",
+    requestBody: {
+      required: true,
+      content: {
+        "application/json": {
+          schema: {
+            type: "object",
+            properties: {
+              email: { type: "string" },
+              secret: { type: "string" },
+            },
+            required: ["refresh_token"],
+          },
+        },
+      },
+    },
     responses: {
       200: {
         description: "Successful registration",
@@ -65,14 +81,14 @@ authn.post(
     }
 
     return c.json({
-      access_token: sign(
+      access_token: await sign(
         {
           sub: user.email,
           exp: Math.floor(Date.now() / 1000) + 60 * 5, // 5 minutes
         },
         JWT_SECRET_ACCESS_KEY!,
       ),
-      refresh_token: sign(
+      refresh_token: await sign(
         {
           sub: user.email,
           exp: Math.floor(Date.now() / 1000) + 60 * 60 * 24 * 7, // 7 days
@@ -87,6 +103,21 @@ authn.post(
   "/login",
   describeRoute({
     description: "Logs in a user using JWT authentication",
+    requestBody: {
+      required: true,
+      content: {
+        "application/json": {
+          schema: {
+            type: "object",
+            properties: {
+              email: { type: "string" },
+              secret: { type: "string" },
+            },
+            required: ["refresh_token"],
+          },
+        },
+      },
+    },
     responses: {
       200: {
         description: "Successful login",
@@ -120,7 +151,7 @@ authn.post(
       }
     }
 
-    if (foundUser.secret !== possibleUser.secret) {
+    if (foundUser.secret !== (await getHashFromString(possibleUser.secret))) {
       // Better to be not very descriptive when dealing with login
       c.status(404);
       return c.text(
@@ -129,14 +160,14 @@ authn.post(
     }
 
     return c.json({
-      access_token: sign(
+      access_token: await sign(
         {
           sub: foundUser.email,
-          exp: Math.floor(Date.now() / 1000) + 60 * 5, // 5 minutes
+          exp: Math.floor(Date.now() / 1000) + 60 * 15, // 15 minutes
         },
         JWT_SECRET_ACCESS_KEY!,
       ),
-      refresh_token: sign(
+      refresh_token: await sign(
         {
           sub: foundUser.email,
           exp: Math.floor(Date.now() / 1000) + 60 * 60 * 24 * 7, // 7 days
@@ -151,6 +182,14 @@ authn.post(
   "/refresh",
   describeRoute({
     description: "Refreshes the access token of a user using the refresh token",
+    parameters: [
+      {
+        name: "refresh_token",
+        in: "cookie",
+        required: true,
+        schema: { type: "string" },
+      },
+    ],
     responses: {
       200: {
         description: "Successful token refresh",
@@ -190,10 +229,10 @@ authn.post(
     }
 
     return c.json({
-      access_token: sign(
+      access_token: await sign(
         {
           sub: payload.sub,
-          exp: Math.floor(Date.now() / 1000) + 60 * 5, // 5 minutes
+          exp: Math.floor(Date.now() / 1000) + 60 * 15, // 5 minutes
         },
         JWT_SECRET_ACCESS_KEY!,
       ),

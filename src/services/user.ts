@@ -20,7 +20,7 @@ export const createUser = async (user: User) => {
   }
 
   user.secret = await getHashFromString(user.secret);
-  db.insert(usersTable).values(user);
+  db.insert(usersTable).values(user).execute();
 };
 
 export const getUserByEmail = async (email: string) => {
